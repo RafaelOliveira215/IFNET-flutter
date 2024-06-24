@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/components/task_form.dart';
 import 'package:flutter_application_1/models/task.dart';
-import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,19 +11,54 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  FirebaseFirestore db = FirebaseFirestore.instance;
   List<Task> taskList = [];
   final List<TextEditingController> _controllers = []; // List of controllers
 
   @override
   void initState() {
     super.initState();
+    gettasks();
+  }
+
+  Future<void> gettasks() async {
+    var dbTaskList = await FirebaseFirestore.instance
+        .collection('todo')
+        .doc('todolist')
+        .get();
+
+    var tasksData = dbTaskList.data()?['tasks'] ?? [];
+    setState(() {
+      taskList = tasksData
+          .map<Task>((task) => Task(
+                description: task['description'],
+                date: task['date'],
+              ))
+          .toList();
+
+      _controllers.addAll(taskList
+          .map((task) => TextEditingController(text: task.description)));
+    });
   }
 
   void addTask(Task task) {
-    setState(() {
-      taskList.add(task);
-      _controllers.add(TextEditingController(text: task.description));
-    });
+    var data = <String, dynamic>{
+      'tasks': FieldValue.arrayUnion([
+        {
+          'description': task.description,
+          'date': task.date,
+        }
+      ])
+    };
+
+    var insertData = db.collection('todo').doc('todolist').update(data);
+
+    insertData.then((_) => {
+          setState(() {
+            taskList.add(task);
+            _controllers.add(TextEditingController(text: task.description));
+          })
+        });
   }
 
   void deleteTask(int index) {

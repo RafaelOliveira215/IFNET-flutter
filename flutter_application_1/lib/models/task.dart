@@ -1,5 +1,5 @@
 class Task {
   String description;
   String date;
-  Task(this.description, this.date);
+  Task({required this.description, required this.date});
 }

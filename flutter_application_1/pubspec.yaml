@@ -1,16 +1,23 @@
 name: flutter_application_1
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
-  sdk: '>=3.3.4 <4.0.0'
+  sdk: ">=3.3.4 <4.0.0"
 
 dependencies:
+  cloud_firestore: ^5.0.1
+  firebase_core: ^3.1.0
   flutter:
     sdk: flutter
+  http: ^1.2.1
   intl: ^0.19.0
   location: ^6.0.2
+  flutter_pkg:
+    git:
+      url: https://github.com/RafaelOliveira215/INFNET-flutter-pkg.git
+      ref: master
 
 dev_dependencies:
   flutter_test:
